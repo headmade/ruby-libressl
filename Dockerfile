@@ -16,6 +16,7 @@ RUN set -ex \
   && apk add --no-cache --virtual .ruby-builddeps \
     autoconf \
     bison \
+    pbzip2 \
     bzip2 \
     bzip2-dev \
     ca-certificates \
@@ -31,6 +32,7 @@ RUN set -ex \
     linux-headers \
     make \
     ncurses-dev \
+    libressl \
     libressl-dev \
     procps \
 # https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
