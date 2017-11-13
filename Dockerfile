@@ -16,7 +16,6 @@ RUN set -ex \
   && apk add --no-cache --virtual .ruby-builddeps \
     autoconf \
     bison \
-    pbzip2 \
     bzip2 \
     bzip2-dev \
     ca-certificates \
