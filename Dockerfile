@@ -12,15 +12,18 @@ ENV RUBY_VERSION 2.4.2
 ENV RUBY_DOWNLOAD_SHA512 96c236bdcd09b2e7cf429da631a487fc00f1255443751c03c8abeb4c2ce57079ad60ef566fecc0bf2c7beb2f080e2b8c4d30f321664547b2dc7d2a62aa1075ef
 ENV RUBYGEMS_VERSION 2.6.13
 
+RUN apk add --no-cache libressl \
+  curl \
+  bzip2 \
+  ca-certificates
+
 RUN set -ex \
   && apk add --no-cache --virtual .ruby-builddeps \
     autoconf \
     bison \
     bzip2 \
     bzip2-dev \
-    ca-certificates \
     coreutils \
-    curl \
     gcc \
     gdbm-dev \
     glib-dev \
@@ -31,7 +34,6 @@ RUN set -ex \
     linux-headers \
     make \
     ncurses-dev \
-    libressl \
     libressl-dev \
     procps \
 # https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
@@ -61,9 +63,6 @@ RUN set -ex \
       | sort -u \
   )" \
   && apk add --virtual .ruby-rundeps $runDeps \
-    bzip2 \
-    ca-certificates \
-    curl \
     libffi-dev \
     libressl-dev \
     yaml-dev \
