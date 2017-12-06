@@ -15,7 +15,8 @@ ENV RUBYGEMS_VERSION 2.6.13
 RUN apk add --no-cache libressl \
   curl \
   bzip2 \
-  ca-certificates
+  ca-certificates \
+  git
 
 RUN set -ex \
   && apk add --no-cache --virtual .ruby-builddeps \
