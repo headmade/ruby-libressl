@@ -9,7 +9,7 @@ RUN mkdir -p /usr/local/etc \
 
 ENV RUBY_MAJOR 2.5
 ENV RUBY_VERSION 2.5.1
-ENV RUBY_DOWNLOAD_SHA512 96c236bdcd09b2e7cf429da631a487fc00f1255443751c03c8abeb4c2ce57079ad60ef566fecc0bf2c7beb2f080e2b8c4d30f321664547b2dc7d2a62aa1075ef
+ENV RUBY_DOWNLOAD_SHA256 886ac5eed41e3b5fc699be837b0087a6a5a3d10f464087560d2d21b3e71b754d
 ENV RUBYGEMS_VERSION 2.6.13
 
 RUN apk add --no-cache libressl \
@@ -43,7 +43,7 @@ RUN set -ex \
     yaml-dev \
     zlib-dev \
   && curl -fSL -o ruby.tar.gz "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.gz" \
-  && echo "$RUBY_DOWNLOAD_SHA512 *ruby.tar.gz" | sha512sum -c - \
+  && echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - \
   && mkdir -p /usr/src \
   && tar -xzf ruby.tar.gz -C /usr/src \
   && mv "/usr/src/ruby-$RUBY_VERSION" /usr/src/ruby \
