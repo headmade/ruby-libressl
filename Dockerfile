@@ -42,12 +42,13 @@ RUN set -ex \
     ruby \
     yaml-dev \
     zlib-dev \
-  && curl -fSL -o ruby.tar.gz "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.gz" \
-  && echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.gz" | sha256sum -c - \
+  && wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/ruby-$RUBY_VERSION.tar.xz" \
+  && echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - \
+
   && mkdir -p /usr/src \
-  && tar -xzf ruby.tar.gz -C /usr/src \
+  && tar -xzf ruby.tar.xz -C /usr/src \
   && mv "/usr/src/ruby-$RUBY_VERSION" /usr/src/ruby \
-  && rm ruby.tar.gz \
+  && rm ruby.tar.xz \
   && cd /usr/src/ruby \
   && { echo '#define ENABLE_PATH_CHECK 0'; echo; cat file.c; } > file.c.new && mv file.c.new file.c \
   && autoconf \
