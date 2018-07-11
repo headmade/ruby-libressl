@@ -19,60 +19,85 @@ RUN apk add --no-cache libressl \
   git
 
 RUN set -ex \
+  \
   && apk add --no-cache --virtual .ruby-builddeps \
     autoconf \
     bison \
     bzip2 \
     bzip2-dev \
+    ca-certificates \
     coreutils \
+    dpkg-dev dpkg \
     gcc \
     gdbm-dev \
     glib-dev \
     libc-dev \
     libffi-dev \
+    libressl \
+    libressl-dev \
     libxml2-dev \
     libxslt-dev \
     linux-headers \
     make \
     ncurses-dev \
-    libressl-dev \
     procps \
-# https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
     readline-dev \
     ruby \
+    tar \
+    xz \
     yaml-dev \
     zlib-dev \
+  \
   && wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%-rc}/ruby-$RUBY_VERSION.tar.xz" \
   && echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - \
-
-  && mkdir -p /usr/src \
-  && tar -xzf ruby.tar.xz -C /usr/src \
-  && mv "/usr/src/ruby-$RUBY_VERSION" /usr/src/ruby \
+  \
+  && mkdir -p /usr/src/ruby \
+  && tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1 \
   && rm ruby.tar.xz \
+  \
   && cd /usr/src/ruby \
-  && { echo '#define ENABLE_PATH_CHECK 0'; echo; cat file.c; } > file.c.new && mv file.c.new file.c \
+  \
+# hack in "ENABLE_PATH_CHECK" disabling to suppress:
+#   warning: Insecure world writable dir
+  && { \
+    echo '#define ENABLE_PATH_CHECK 0'; \
+    echo; \
+    cat file.c; \
+  } > file.c.new \
+  && mv file.c.new file.c \
+  \
   && autoconf \
-  # the configure script does not detect isnan/isinf as macros
-  && ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
-    ./configure --disable-install-doc \
-  && make -j"$(getconf _NPROCESSORS_ONLN)" \
+  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+# the configure script does not detect isnan/isinf as macros
+  && export ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
+  && ./configure \
+    --build="$gnuArch" \
+    --disable-install-doc \
+    --enable-shared \
+  && make -j "$(nproc)" \
   && make install \
+  \
   && runDeps="$( \
-    scanelf --needed --nobanner --recursive /usr/local \
-      | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+    scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+      | tr ',' '\n' \
       | sort -u \
-      | xargs -r apk info --installed \
-      | sort -u \
+      | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
   )" \
   && apk add --virtual .ruby-rundeps $runDeps \
+    bzip2 \
+    ca-certificates \
     libffi-dev \
     libressl-dev \
-    yaml-dev \
     procps \
+    yaml-dev \
     zlib-dev \
   && apk del .ruby-builddeps \
-  && gem update --system $RUBYGEMS_VERSION \
-  && rm -r /usr/src/ruby
+  && cd / \
+  && rm -r /usr/src/ruby \
+  \
+  && gem update --system "$RUBYGEMS_VERSION" \
+  && gem install bundler --version "$BUNDLER_VERSION" --force \
+  && rm -r /root/.gem/
 
 ENV BUNDLER_VERSION 1.16.0
 
