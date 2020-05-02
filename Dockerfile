@@ -8,8 +8,8 @@ RUN mkdir -p /usr/local/etc \
   } >> /usr/local/etc/gemrc
 
 ENV RUBY_MAJOR 2.5
-ENV RUBY_VERSION 2.5.1
-ENV RUBY_DOWNLOAD_SHA256 886ac5eed41e3b5fc699be837b0087a6a5a3d10f464087560d2d21b3e71b754d
+ENV RUBY_VERSION 2.5.8
+ENV RUBY_DOWNLOAD_SHA256 6c0bdf07876c69811a9e7dc237c43d40b1cb6369f68e0e17953d7279b524ad9a
 ENV RUBYGEMS_VERSION 2.6.13
 
 RUN apk add --no-cache libressl \
@@ -99,7 +99,7 @@ RUN set -ex \
   && gem install bundler --version "$BUNDLER_VERSION" --force \
   && rm -r /root/.gem/
 
-ENV BUNDLER_VERSION 1.16.0
+ENV BUNDLER_VERSION 1.17.3
 
 RUN gem install bundler --version "$BUNDLER_VERSION"
 
